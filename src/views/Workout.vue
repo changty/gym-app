@@ -3,6 +3,9 @@
 </template>
 
 <script>
+
+import 'firebase/firestore'; 
+
     export default {
         data() {
             return {

@@ -1,16 +1,12 @@
-import firebase from 'firebase/app';
+import firebase from 'firebase';
 import 'firebase/firestore';
-import config from './config.js'; 
 
-const firebaseConfig = {
-    apiKey: config.apiKey,
-    authDomain: config.authDomain,
-    projectId: config.projectId,
-    storageBucket: config.storageBucket,
-    messagingSenderId: config.messagingSenderId,
-    appId: config.appId, 
-    measurementId: config.measurementId
-  };
+const db = firebase.firestore()
+const usersCollection = db.collection('users')
+const workoutsCollections = db.collection('workouts')
 
-  const firebaseApp = firebase.initializeApp(firebaseConfig);
-  export const db = firebaseApp.firestore();
+export {
+    db,
+    usersCollection,
+    workoutsCollections
+}
