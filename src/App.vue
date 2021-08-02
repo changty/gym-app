@@ -1,6 +1,6 @@
 <template>
   <h1>Gym app</h1>
-  <div v-if="isLoggedIn">
+  <div v-if="sharedState.isLoggedIn">
     <button @click="signOut">Logout</button>
   </div>
    <router-view></router-view>
@@ -8,35 +8,42 @@
 </template>
 
 <script>
-import firebase from 'firebase'
+import { reactive } from 'vue'
+import { auth } from './firebase'
 import router from './router';
+
+const store =  {
+  state: reactive({
+    isLoggedIn: true,
+    displayName: '',
+    email: '',
+  })
+}
 
 export default {
   data() {
     return {
-     isLoggedIn: true,
-     name: '', 
-     email: '',
+      sharedState: store.state
     }
   },
   name: 'App',
-  created() {
-      firebase.auth().onAuthStateChanged((user) => {
+  mounted() {
+      auth.onAuthStateChanged((user) => {
         if (user) {
-          this.isLoggedIn = true // if we have a user
-          this.name = user.displayName
-          this.email = user.email
+          this.sharedState.isLoggedIn = true // if we have a user
+          this.sharedState.name = user.displayName
+          this.sharedState.email = user.email
         } else {
-          this.isLoggedIn = false // if we do not
-          router.push('/login');
-          this.name = ""
-          this.email = ""
+          this.sharedState.isLoggedIn = false // if we do not
+          this.router.push('/login');
+          this.sharedState.name = ""
+          this.sharedState.email = ""
         }
       });
   },
   methods: {
     signOut() {
-      firebase.auth().signOut(); 
+      auth.signOut(); 
       router.push('/login');
     },
   }
