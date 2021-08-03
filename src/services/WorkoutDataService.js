@@ -1,44 +1,53 @@
 import  { db } from "../firebase"; 
 
 class WorkoutDataService {
-  getAll() {
-    return db.collection('workouts');
+  // Templates
+  getTemplates(owner) {
+    return db.collection('templates').where("owner", "==", owner)
+  }
+
+  getTemplate(id) {
+    return db.collection('templates').doc(id)
+  }
+
+  updateTemplate(id, template) {
+    return db.collection('templates').doc(id).set(template, {merge: true})
+  }
+
+  createTemplate(template) {
+    template.createdAt = Date.now() 
+    return db.collection('templates').add(template)
+  }
+
+  deleteTemplate(id) {
+    return db.collection('templates').doc(id).delete()
+  }
+
+  // Workouts
+  getWorkouts(owner) {
+    return db.collection('workouts').where("owner", "==", owner)
   }
 
   getWorkout(id) {
-    console.log("getting: ", id)
     return db.collection('workouts').doc(id)
-  } 
-
-  getOwnWorkouts(owner) {
-    return db.collection('workouts').where("owner", "==", owner)//.orderBy("createdAt")
-  } 
-
-  create(workout) {
-
-    workout.createdAt = Date.now();
-    return db.collection('workouts').add(workout);
   }
 
-  update(key, workout) {
-    return db.collection('workouts').doc(key).set(workout);
+  updateWorkout(id, template) {
+    return db.collection('workouts').doc(id).set(template, {merge: true})
   }
 
-  delete(key) {
-    return db.collection('workouts').doc(key).delete();
+  createWorkout(template) {
+    if(Object.prototype.hasOwnProperty.call(template, 'id')) {
+      delete template.id
+    }
+    template.createdAt = Date.now()
+    return db.collection('workouts').add(template)
   }
 
-  deleteAll() {
-    //return db.collection('workouts').remove();
+  deleteWorkout(id) {
+    return db.collection('workouts').doc(id).delete()
   }
 
-  getMoves(workoutId) {
-    return db.collection('moves').where('workout', '==', workoutId)
-  } 
-
-  addMove(move) {
-    return db.collection('moves').add(move)
-  }
 }
 
 export default new WorkoutDataService();

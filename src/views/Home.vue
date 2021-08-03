@@ -1,11 +1,24 @@
 <template>
    <h1>Welcome {{ sharedState.name }} (Home)</h1>
-   <button @click="addNewWorkout">Add new workout</button>
+   <h2>Templates</h2>
+   <button @click="addNewTemplate">Add new workout template</button>
 
     <ul>
-        <li @click="openWorkout(item.id)" v-for="item in workouts" :key="item.id">
-            <p>{{item.name}} - {{item.owner}}</p>
+        <li @click.self="openTemplate(item.id)" v-for="(item, index) in templates" :key="item.id">
+            <p>{{item.name}}</p>
             <p>{{item.description}}</p>
+            <p>{{item.exercises.length}} exercises</p>
+            <p><button @click.self="createWorkout(index)">new workout</button></p>
+        </li>
+    </ul>
+
+    <hr/>
+    <h2>Workouts</h2>    <ul>
+        <li @click.self="openWorkout(item.id)" v-for="(item, index) in workouts" :key="item.id">
+            <p>{{index}} {{item.name}}</p>
+            <p>{{item.description}}</p>
+            <p>{{item.exercises.length}} exercises</p>
+            <p>{{item.createdAt}}</p>
         </li>
     </ul>
 </template>
@@ -18,7 +31,8 @@
 
         data() {
             return {
-                workouts: [],
+                templates: [],
+                workouts:[],
                 sharedState: this.$root.$data.sharedState,
             }
         },
@@ -30,20 +44,34 @@
         watch: {
             owner(newVal) {
                 if(newVal.length > 0) {
+                    this.getTemplates()
                     this.getWorkouts()
                 }
             }
         },
 
         methods: {
-            openWorkout(itemId) {
-                router.push('/workout/' + itemId)
+            openTemplate(itemId) {
+                router.push('/newTemplate/' + itemId)
             },
-            addNewWorkout: function() {
-                router.push("/newWorkout")        
+            addNewTemplate: function() {
+                router.push("/newTemplate")        
+            },
+            getTemplates() {
+                WorkoutDataService.getTemplates(this.sharedState.email)
+                .get() 
+                .then( querySnapshot => {
+                    const documents = querySnapshot.docs.map(doc => {
+                             let d = doc.data()
+                             d.id = doc.id
+                             return d; 
+                            }
+                        )
+                    this.templates = documents; 
+                });
             },
             getWorkouts() {
-                WorkoutDataService.getOwnWorkouts(this.sharedState.email)
+                WorkoutDataService.getWorkouts(this.sharedState.email)
                 .get() 
                 .then( querySnapshot => {
                     const documents = querySnapshot.docs.map(doc => {
@@ -54,15 +82,20 @@
                         )
                     this.workouts = documents; 
                 });
+            },
+            createWorkout(index) {
+                let toCopy = this.templates[index] 
+                WorkoutDataService.createWorkout({...toCopy, template: toCopy.id})
             }
         },
         created() {
-            this.getWorkouts()            
+            this.getTemplates()            
+            this.getWorkouts()
         }
     }
 </script>
 
-<style scoped>
+<style>
 ul {
     list-style-type: none; 
     padding:0; 

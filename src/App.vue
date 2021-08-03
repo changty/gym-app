@@ -1,8 +1,13 @@
 <template>
+<div class="header">
+  <div v-if="$route.name !== 'home'">
+  <button @click="back">Back</button>
+  </div>
   <h1>Gym app</h1>
   <div v-if="sharedState.isLoggedIn">
     <button @click="signOut">Logout</button>
   </div>
+</div>
    <router-view></router-view>
   
 </template>
@@ -23,9 +28,11 @@ const store =  {
 export default {
   data() {
     return {
+      currentRoute: '',
       sharedState: store.state
     }
   },
+
   name: 'App',
   mounted() {
       auth.onAuthStateChanged((user) => {
@@ -46,6 +53,9 @@ export default {
       auth.signOut(); 
       router.push('/login');
     },
+    back() {
+      router.back();
+    }
   }
 }
 
@@ -60,4 +70,12 @@ export default {
   color: #2c3e50;
   margin-top: 60px;
 }
+
+.header {
+  display: flex; 
+  align-content: flex-end;
+  justify-content: center; 
+  flex-direction: row;
+}
+
 </style>

@@ -3,9 +3,10 @@
    {{workout.name}} - {{workout.description}}
    <br/><br/>
     <ul>
-        <li v-for="item in moves" :key="item.id">
+        <li v-for="item in workout.exercises" :key="item.name">
             <p><b>{{item.name}}</b></p>
             <p>{{item.notes}}</p>
+            <p>{{item.sets}}</p>
         </li>
     </ul>
    <br/><br/>
@@ -21,34 +22,16 @@
             return {
                 id: null,
                 workout: {},
-                moves: [],
                 sharedState: this.$root.$data.sharedState
             }
         },
 
         created() {
               this.id = this.$route.params.id
-
               this.getWorkout()
-
-              this.getMoves()
         },
 
         methods: {
-            getMoves() {
-                WorkoutDataService.getMoves(this.id)
-                .get() 
-                .then( querySnapshot => {
-                    const documents = querySnapshot.docs.map(doc => {
-                             let d = doc.data()
-                             d.id = doc.id
-                             return d; 
-                            }
-                        )
-                    this.moves = documents; 
-                });
-            },
-
             getWorkout() {
                 WorkoutDataService.getWorkout(this.id)
                 .get() 
