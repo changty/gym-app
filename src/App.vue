@@ -1,14 +1,20 @@
 <template>
-<div class="header">
+<nav class="navbar navbar-expand-lg navbar-light bg-light justify-content-between">
   <div v-if="$route.name !== 'home'">
-  <button @click="back">Back</button>
+    <button class="navbar-brand btn btn-outline-dark navbar-brand" @click="back">Back</button>
   </div>
-  <h1>Gym app</h1>
+
+
+
+  <p style="text-align: center;">Gym app</p>
   <div v-if="sharedState.isLoggedIn">
-    <button @click="signOut">Logout</button>
+    <button @click="signOut" class="btn btn-danger">Logout</button>
   </div>
-</div>
+</nav>
+
+<div class="container">
    <router-view></router-view>
+</div>
   
 </template>
 
@@ -16,6 +22,7 @@
 import { reactive } from 'vue'
 import { auth } from './firebase'
 import router from './router';
+
 
 const store =  {
   state: reactive({
@@ -62,20 +69,21 @@ export default {
 </script>
 
 <style>
+
+html, body {
+  margin: 0;
+  padding:0;
+  color: #2c3e50;
+
+}
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
 }
 
-.header {
-  display: flex; 
-  align-content: flex-end;
-  justify-content: center; 
-  flex-direction: row;
+.navbar {
+  margin: 0em 1em; 
 }
 
 </style>
