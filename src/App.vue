@@ -8,7 +8,7 @@
 
   <p style="text-align: center;">Gym app</p>
   <div v-if="sharedState.isLoggedIn">
-    <button @click="signOut" class="btn btn-danger">Logout</button>
+    <button @click="signOut" class="btn btn-outline-danger">Logout</button>
   </div>
 </nav>
 
@@ -74,8 +74,10 @@ html, body {
   margin: 0;
   padding:0;
   color: #2c3e50;
-
+  background: #f9f9f9;
 }
+
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -83,7 +85,7 @@ html, body {
 }
 
 .navbar {
-  margin: 0em 1em; 
+  padding: 0em 1rem; 
 }
 
 </style>

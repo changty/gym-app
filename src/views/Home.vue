@@ -5,36 +5,35 @@
 
 <div class="templates">
 
-    <div @click="addNewTemplate" class="card shadow bg-body rounded">
-            <div class="card-body">
-                Add a new workout template
-            </div>
-    </div>
-
-
     <div class="card" v-for="(item, index) in templates" :key="item.id">
         <div class="card-body">
         <h5 class="card-title">{{item.name}}</h5>
         <p class="card-text">{{item.description}}</p>
         <p class="card-text">{{item.exercises.length}} exercises</p>
         <button class="btn btn-outline-primary" @click.self="createWorkout(index)">Start a workout</button>
-        <button class="btn btn-outline-dark" @click.self="openTemplate(item.id)">Edit</button>
+        <button class="btn btn-link" @click.self="openTemplate(item.id)">Edit</button>
 
         </div>
+    </div>
+    <div @click="addNewTemplate" class="new card shadow bg-body rounded">
+            <div class="card-body">
+                Add a new workout template
+            </div>
     </div>
 </div>
 
+
     <h2>Workouts</h2>  
-    <div class="workouts">
-        <div class="card" @click.self="openWorkout(item.id)" v-for="(item) in workouts" :key="item.id">
-            <div class="card-body">
-                <h5 class="card-title">{{item.name}}</h5>
-                <p class="card-text">{{item.description}}</p>
-                <p class="card-text">{{item.exercises.length}} exercises</p>
-                <p class="card-text">{{since(item.createdAt)}} - {{date(item.createdAt)}}</p>
+    <ul class="list-group ">
+        <li class="list-group-item" @click="openWorkout(item.id)" v-for="(item) in workouts" :key="item.id">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">{{item.name}}</h5>
+                <small>{{since(item.createdAt)}}</small>
             </div>
-        </div>
-    </div>
+            <p class="mb-1">{{item.description}}</p>
+            <small>{{date(item.createdAt)}}</small>
+        </li>
+    </ul>
 </template>
 
 <script>
@@ -120,18 +119,32 @@
 </script>
 
 <style>
-.templates, 
-.workouts {
-    display:flex; 
-    flex-direction: row;
-    justify-items: center;
-    flex-wrap:wrap;
+.templates {
+    display: flex;
+    flex-direction: row; 
+    flex-wrap: nowrap; 
+    overflow-x:auto;
+    scroll-snap-type: x proximity;
+    scroll-padding: 25%;
+    width: auto;
+}
+.templates .card {
+    min-width: 18rem; 
+    scroll-snap-align: start;
+}
+
+.card.new {
+    min-width: 10rem; 
+    width: 10rem; 
+}
+
+.card .btn {
+    margin-right: 1rem; 
 }
 .card {
     cursor: pointer;
-    width: 45%; 
+    width: 18rem;
+    min-width: 18rem; 
     margin: 1em; 
-    flex-grow: 0;
-
 }
 </style>
