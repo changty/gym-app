@@ -1,54 +1,89 @@
 <template>
-   <h1>{{workout.name}}</h1>
-   <p>{{workout.description}}</p>
-   <br/><br/>
-    <ul>
-        <li @click="e => e.target.classList.toggle('active')" v-for="(item, index) in workout.exercises" :key="item.name">
-            <p><b>{{item.name}}</b></p>
-            <p>{{item.notes}}</p>
-            <p>{{item.sets.length}} sets</p>
-            <p>Total volume: {{ totalVolume(index) }}</p>
-            <button @click="newSet(index)">Add a set</button>
-            <div class="sets">
-                <ul>
-                    <li v-for="(set, index) in item.sets" :key="index">
-                        <span>Set {{index+1}}</span>
-                        <div>
-                            <label for="weight">Weight</label>
-                            <input type="number" id="weight" required name="weight" ref="weight" v-model="set.weight"/>
-                        </div>
-                        <div>
-                            <label for="reps">Reps</label>
-                            <input type="number" id="reps" required name="reps" ref="reps"  v-model="set.reps"/>
-                        </div>
-                         <div>
-                            <label for="rest">Rest</label>
-                            <input type="number" id="rest" required name="rest" ref="rest"  v-model="set.rest"/>
-                        </div>
-                     </li>
-                </ul>
+    <div class="d-flex w-100 justify-content-between mt-3 mb-3">
+        <div>
+            <h1>{{workout.name}}</h1>
+            <p>{{workout.description}}</p>
+            <p class="small">{{since(workout.createdAt)}}<br/>({{date(workout.createdAt)}})</p>
+        </div>
+        <div>  
+            <button @click="toggleEdit" class="btn btn-link">{{editButton}}</button>
+        </div>
+    </div>
+
+
+
+        <div class="card mb-5 shadow-sm" v-for="(item, index) in workout.exercises" :key="item.name">
+            <div class="card-header d-flex w-100 justify-content-between">
+                <div>
+                    <b>{{item.name}} ({{item.sets.length}} sets)</b>
+                    <p class="card-text">{{item.notes}}</p>
+                </div>
+                <div>
+                    <p>Total volume: {{ totalVolume(index) }}</p>
+                </div>
             </div>
-        </li>
-    </ul>
-   <br/><br/>
-    <button @click="remove">Delete</button>
+
+            <div class="card-body">
+                    <div class="sets">
+                        <ul>
+                            <li v-for="(set, setIndex) in item.sets" :key="setIndex">
+                                <span>Set {{setIndex+1}}</span>
+                                <div>
+                                    <span>{{previousData(item.name, setIndex)}}</span>
+                                </div>
+                                <div>
+                                    <label for="reps">Reps</label>
+                                    <input type="number" id="reps" required name="reps" ref="reps"  v-model="set.reps"/>
+                                </div>
+                                <div>
+                                    <label for="weight">Weight</label>
+                                    <input type="number" id="weight" required name="weight" ref="weight" v-model="set.weight"/>
+                                </div>
+                                <!-- lets skip this for now -->
+                                <!-- <div>
+                                    <label for="rest">Rest</label>
+                                    <input type="number" id="rest" required name="rest" ref="rest"  v-model="set.rest"/>
+                                </div> -->
+                                <div v-if="edit">
+                                    <button @click="removeSet(index, setIndex)" class="btn btn-danger btn-sm">x</button>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <button class="btn btn-outline-primary btn-block"  style="flex-grow:100; width:100%" @click="newSet(index)">Add a set</button>
+                </div>
+            </div>
+    
+    <!-- <button @click="addExercise" class="btn-block btn btn-outline-primary" style="width:100%">Add</button> -->
+
+
+    <div v-if="edit">
+        <button class="btn btn-danger" @click="remove">Delete workout</button>
+    </div>
 </template>
 
 <script>
     import WorkoutDataService from '../services/WorkoutDataService';
     import router from '../router'
+    import moment from 'moment';
+
     export default {
         data() {
             return {
+                edit: false,
+                editButton: "edit",
                 id: null,
                 workout: {},
-                sharedState: this.$root.$data.sharedState
+                previousWorkout: {},
+                allWorkouts: {},
+                state: this.$root.$data.sharedState
             }
         },
 
         created() {
               this.id = this.$route.params.id
               this.getWorkout()
+              this.getSimilarWorkouts()
         },
 
         methods: {
@@ -57,24 +92,35 @@
                 let sum = 0; 
                 for(let i=0; i<sets.length; i++) {
                     let set = sets[i];
-                    sum += set.weight* set.reps
+                    sum += set.weight*set.reps
                 }
                 
                 return sum
 
             }, 
-
             getWorkout() {
-                WorkoutDataService.getWorkout(this.id)
-                .get() 
-                .then( (doc) => {
-                    if(doc.exists) {
-                        this.workout = doc.data()
-                    }
-                    else{
-                        console.log("nothing to show")
-                    }
-                });
+                // Filter this workout from shared state workouts
+                this.workout = this.state.workouts.find(w => w.id === this.id)
+            },
+            date(time) {
+                return moment(time).format('MMMM Do YYYY, h:mm:ss')
+            },
+            since(time) {
+                return moment(time).fromNow(); 
+            },
+
+            getSimilarWorkouts() {
+
+                let filtered = []; 
+                filtered = this.state.workouts.filter(w => w.template === this.workout.template); 
+                // sort from newest to oldest
+                filtered.sort((a,b) => (a.createdAt > b.createdA) ? 1 : ((b.createdAt > a.createdAt) ? -1 : 0))
+                this.allWorkouts = filtered; 
+                // get previous workout, if there are any
+                if(filtered.length > 0) {
+                    this.previousWorkout = this.allWorkouts[0]
+                }
+
             },
             remove() {
                 WorkoutDataService.delete(this.id)
@@ -87,7 +133,6 @@
             },
 
             save() {
-
                 let toSave = {
                     name: this.workout.name,
                     description: this.workout.description,
@@ -95,7 +140,6 @@
                 }
                     WorkoutDataService.updateWorkout(this.id, toSave)
                         .then(() =>{
-                            console.log("updated"); 
                         })
                         .catch(e => {
                             console.log("error updating template", e)
@@ -103,28 +147,42 @@
             },
 
             newSet(index) {
-                this.workout.exercises[index].sets.push({weight: 0, reps: 0, rest: 60})
+                this.workout.exercises[index].sets.push({index: this.workout.exercises[index].sets.length, weight: 0, reps: 0, rest: 60})
                 this.save()
-            } 
+            }, 
+
+            removeSet(index, setIndex) {
+                this.workout.exercises[index].sets.splice(setIndex, 1);
+                this.save(); 
+            },
+            toggleEdit(){
+                this.edit = !this.edit
+                if(this.edit) {
+                    this.editButton="done"
+                }
+                else {
+                    this.editButton="edit"
+                }
+            },
+
+            previousData(exerciseName, set) {
+                if(this.previousWorkout.exercises !== undefined)  {
+
+                    const previous = this.previousWorkout.exercises.find(e => e.name === exerciseName)
+                    if(previous && previous.sets && this.previousWorkout.createdAt < this.workout.createdAt) {
+                        if(typeof previous.sets[set] !== 'undefined') {
+                            return previous.sets[set].reps + "x" + previous.sets[set].weight
+                        }
+                    }
+                    return "-"
+                }
+            }
+            
         }
     }
 </script>
 
 <style scoped>
-    ul, li, .sets {
-        max-width: 100%; 
-        box-sizing: border-box;
-    }
-    li .sets {
-        display: none; 
-        opacity: 0;
-
-    }
-    li.active .sets {
-        display: flex; 
-        opacity: 1; 
-    }
-
     .sets li {
         width:100%; 
         display: flex; 
@@ -134,21 +192,27 @@
     }
 
     .sets li>div {
-        margin: 0px .5em;
-        display:flex; 
+        margin: 0px .25em;
+        display: flex; 
         flex-direction: column;
         flex-grow: 0;
+        width: 100%;
+        align-items: stretch;
     }
 
     .sets li input {
         font-size: 16px; 
         flex-grow: 0;
+        width: 70px;
     }
     .sets li span {
+        text-align:center;
         background: #eee; 
         padding: .25em .5em; 
         border-radius: .5em; 
-        font-size: 14px;
+        font-size: 13px;
+        min-width:45px;
     }
+
 
 </style>

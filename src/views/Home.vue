@@ -1,31 +1,31 @@
 <template>
-   <h1>Welcome {{ sharedState.name }}</h1>
+   <h1>Welcome {{ state.name }}</h1>
    <h2>Templates</h2>
 
 
 <div class="templates">
+    <div @click="addNewTemplate" class="new card shadow bg-body rounded">
+            <div class="mr-auto card-body">
+                Add a new workout template
+            </div>
+    </div>
 
-    <div class="card" v-for="(item, index) in templates" :key="item.id">
+    <div class="card" v-for="(item, index) in state.templates" :key="item.id">
         <div class="card-body">
         <h5 class="card-title">{{item.name}}</h5>
         <p class="card-text">{{item.description}}</p>
         <p class="card-text">{{item.exercises.length}} exercises</p>
-        <button class="btn btn-outline-primary" @click.self="createWorkout(index)">Start a workout</button>
-        <button class="btn btn-link" @click.self="openTemplate(item.id)">Edit</button>
+        <button class="btn btn-outline-primary btn-sm" @click.self="createWorkout(index)">Start a workout</button>
+        <button class="btn btn-link btn-sm" @click.self="openTemplate(item.id)">Edit</button>
 
         </div>
-    </div>
-    <div @click="addNewTemplate" class="new card shadow bg-body rounded">
-            <div class="card-body">
-                Add a new workout template
-            </div>
     </div>
 </div>
 
 
     <h2>Workouts</h2>  
     <ul class="list-group ">
-        <li class="list-group-item" @click="openWorkout(item.id)" v-for="(item) in workouts" :key="item.id">
+        <li class="list-group-item" @click="openWorkout(item.id)" v-for="(item) in state.workouts" :key="item.id">
             <div class="d-flex w-100 justify-content-between">
                 <h5 class="mb-1">{{item.name}}</h5>
                 <small>{{since(item.createdAt)}}</small>
@@ -47,12 +47,12 @@
             return {
                 templates: [],
                 workouts:[],
-                sharedState: this.$root.$data.sharedState,
+                state: this.$root.$data.sharedState,
             }
         },
         computed: {
             owner() {
-                return this.sharedState.email
+                return this.state.email
             }
         },
         watch: {
@@ -69,7 +69,7 @@
                 return moment(time).fromNow(); 
             },
             date(time) {
-                return moment(time).format('MMMM Do YYY, h:mm')
+                return moment(time).format('MMMM Do YYYY, h:mm:ss')
             },
             openTemplate(itemId) {
                 router.push('/newTemplate/' + itemId)
@@ -81,7 +81,7 @@
                 router.push("/newTemplate")        
             },
             getTemplates() {
-                WorkoutDataService.getTemplates(this.sharedState.email)
+                WorkoutDataService.getTemplates(this.state.email)
                 .get() 
                 .then( querySnapshot => {
                     const documents = querySnapshot.docs.map(doc => {
@@ -90,11 +90,11 @@
                              return d; 
                             }
                         )
-                    this.templates = documents; 
+                    this.state.templates = documents; 
                 });
             },
             getWorkouts() {
-                WorkoutDataService.getWorkouts(this.sharedState.email)
+                WorkoutDataService.getWorkouts(this.state.email)
                 .get() 
                 .then( querySnapshot => {
                     const documents = querySnapshot.docs.map(doc => {
@@ -103,11 +103,11 @@
                              return d; 
                             }
                         )
-                    this.workouts = documents; 
+                    this.state.workouts = documents.sort((a,b) => (a.createdAt > b.createdA) ? 1 : ((b.createdAt > a.createdAt) ? -1 : 0)); 
                 });
             },
             createWorkout(index) {
-                let toCopy = this.templates[index] 
+                let toCopy = this.state.templates[index] 
                 WorkoutDataService.createWorkout({...toCopy, template: toCopy.id})
             }
         },
@@ -118,7 +118,7 @@
     }
 </script>
 
-<style>
+<style scoped>
 .templates {
     display: flex;
     flex-direction: row; 
@@ -127,24 +127,27 @@
     scroll-snap-type: x proximity;
     scroll-padding: 25%;
     width: auto;
+    margin-bottom: 1em;
 }
 .templates .card {
-    min-width: 18rem; 
+    min-width: 12rem; 
     scroll-snap-align: start;
 }
 
 .card.new {
     min-width: 10rem; 
     width: 10rem; 
+    background: #eee !important;
 }
 
 .card .btn {
     margin-right: 1rem; 
 }
+
 .card {
     cursor: pointer;
-    width: 18rem;
-    min-width: 18rem; 
+    width: 12rem;
+    min-width: 12rem; 
     margin: 1em; 
 }
 </style>

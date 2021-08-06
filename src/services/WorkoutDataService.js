@@ -28,6 +28,10 @@ class WorkoutDataService {
     return db.collection('workouts').where("owner", "==", owner)
   }
 
+  getSimilarWorkouts(template) {
+    return db.collection('workouts').where("template", "==", template)
+  }
+
   getWorkout(id) {
     return db.collection('workouts').doc(id)
   }

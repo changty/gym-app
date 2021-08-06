@@ -1,14 +1,14 @@
 <template>
 <nav class="navbar navbar-expand-lg navbar-light bg-light justify-content-between">
   <div v-if="$route.name !== 'home'">
-    <button class="navbar-brand btn btn-outline-dark navbar-brand" @click="back">Back</button>
+    <button class="btn btn-outline-dark btn-sm" @click="back">Back</button>
   </div>
 
 
 
   <p style="text-align: center;">Gym app</p>
   <div v-if="sharedState.isLoggedIn">
-    <button @click="signOut" class="btn btn-outline-danger">Logout</button>
+    <button @click="signOut" class="btn btn-outline-danger btn-sm">Logout</button>
   </div>
 </nav>
 
@@ -75,6 +75,7 @@ html, body {
   padding:0;
   color: #2c3e50;
   background: #f9f9f9;
+  padding-bottom: 1em;
 }
 
 
