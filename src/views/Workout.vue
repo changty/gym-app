@@ -1,9 +1,23 @@
 <template>
     <div class="d-flex w-100 justify-content-between mt-3 mb-3">
-        <div>
+        <div v-if="!edit">
             <h1>{{workout.name}}</h1>
             <p>{{workout.description}}</p>
             <p class="small">{{since(workout.createdAt)}}<br/>({{date(workout.createdAt)}})</p>
+            <p class="small">{{since(previousWorkout.createdAt)}}<br/>({{date(previousWorkout.createdAt)}})</p>
+        </div>
+        <div v-if="edit">
+             <div class="form">
+                <label for="name">Name</label>
+                <input id="name" required v-model="workout.name" name="name" />
+                <br/>
+                <label for="description">Description</label>
+                <input id="description" v-model="workout.description" name="description" />
+                <br/>
+                <span>
+                    <button @click="save">Save</button> 
+                </span>
+        </div>
         </div>
         <div>  
             <button @click="toggleEdit" class="btn btn-link">{{editButton}}</button>
@@ -53,8 +67,15 @@
                     <button class="btn btn-outline-primary btn-block"  style="flex-grow:100; width:100%" @click="newSet(index)">Add a set</button>
                 </div>
             </div>
-    
-    <!-- <button @click="addExercise" class="btn-block btn btn-outline-primary" style="width:100%">Add</button> -->
+    <div v-if="addExercise">
+            <label for="exerciseName">Exercise name</label>
+            <input id="exerciseName" required name="exerciseName" ref="exerciseName"/>
+            <br/>
+            <label for="notes">Notes</label>
+            <input id="notes" name="notes" ref="notes"/>
+    <button @click="addNewExercise" class="btn-block btn btn-outline-primary">Add</button>
+    </div>
+    <button @click="toggleAddExercise" class="btn-block btn btn-primary" style="width:100%">{{addExerciseButtonText}}</button>
 
 
     <div v-if="edit">
@@ -70,6 +91,8 @@
     export default {
         data() {
             return {
+                addExerciseButtonText: "Add an exercise", 
+                addExercise: false,
                 edit: false,
                 editButton: "edit",
                 id: null,
@@ -81,9 +104,18 @@
         },
 
         created() {
-              this.id = this.$route.params.id
-              this.getWorkout()
-              this.getSimilarWorkouts()
+            if(this.$route.params.id === "new") {
+                this.workout.name = ""
+                this.workout.description = ""
+                this.workout.exercises = []
+                this.edit = true
+                this.editButton = "done"
+            }
+            else {
+                this.id = this.$route.params.id
+                this.getWorkout()
+                this.getSimilarWorkouts()
+            }
         },
 
         methods: {
@@ -114,16 +146,16 @@
                 let filtered = []; 
                 filtered = this.state.workouts.filter(w => w.template === this.workout.template); 
                 // sort from newest to oldest
-                filtered.sort((a,b) => (a.createdAt > b.createdA) ? 1 : ((b.createdAt > a.createdAt) ? -1 : 0))
+                filtered = filtered.sort((a,b) => (a.createdAt > b.createdAt) ? -1 : ((b.createdAt > a.createdAt) ? 1 : 0))
                 this.allWorkouts = filtered; 
                 // get previous workout, if there are any
-                if(filtered.length > 0) {
-                    this.previousWorkout = this.allWorkouts[0]
+                if(filtered.length > 1) {
+                    this.previousWorkout = this.allWorkouts[1]
                 }
 
             },
             remove() {
-                WorkoutDataService.delete(this.id)
+                WorkoutDataService.deleteWorkout(this.id)
                 .then(() => {
                     router.push('/')
                 })
@@ -138,12 +170,27 @@
                     description: this.workout.description,
                     exercises: this.workout.exercises
                 }
+
+                if(this.id !== null) {
                     WorkoutDataService.updateWorkout(this.id, toSave)
                         .then(() =>{
                         })
                         .catch(e => {
                             console.log("error updating template", e)
                         })
+                }
+                else {
+                    toSave.owner = this.state.email
+                    toSave.createdAt = Date.now() 
+
+                    WorkoutDataService.createWorkout(toSave)
+                        .then((docRef) => {
+                            this.id = docRef.id
+                        })
+                        .catch(e => {
+                            console.log("Error saving new workout", e)
+                        })
+                }
             },
 
             newSet(index) {
@@ -155,6 +202,21 @@
                 this.workout.exercises[index].sets.splice(setIndex, 1);
                 this.save(); 
             },
+
+            addNewExercise() {
+                let exercise = {
+                    name: this.$refs.exerciseName.value,
+                    notes: this.$refs.notes.value,
+                    sets:[]
+                }
+
+                this.$refs.exerciseName.value = ''
+                this.$refs.notes.value = ''
+                this.workout.exercises.push(exercise);
+
+                this.save()
+            },
+
             toggleEdit(){
                 this.edit = !this.edit
                 if(this.edit) {
@@ -162,6 +224,17 @@
                 }
                 else {
                     this.editButton="edit"
+                    this.save()
+                }
+            },
+
+            toggleAddExercise() {
+                this.addExercise = !this.addExercise
+                if(this.addExercise) {
+                    this.addExerciseButtonText = "Cancel"
+                }
+                else {
+                    this.addExerciseButtonText = "Add an exercise"
                 }
             },
 

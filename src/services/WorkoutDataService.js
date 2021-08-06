@@ -25,7 +25,7 @@ class WorkoutDataService {
 
   // Workouts
   getWorkouts(owner) {
-    return db.collection('workouts').where("owner", "==", owner)
+    return db.collection('workouts').where("owner", "==", owner)//.orderBy("createdAt", "asc")
   }
 
   getSimilarWorkouts(template) {
@@ -40,12 +40,8 @@ class WorkoutDataService {
     return db.collection('workouts').doc(id).set(template, {merge: true})
   }
 
-  createWorkout(template) {
-    if(Object.prototype.hasOwnProperty.call(template, 'id')) {
-      delete template.id
-    }
-    template.createdAt = Date.now()
-    return db.collection('workouts').add(template)
+  createWorkout(workout) {
+    return db.collection('workouts').add(workout)
   }
 
   deleteWorkout(id) {

@@ -22,14 +22,7 @@ const routes = [
             auth: true
         }
   },
-  {
-        path: '/newTemplate',
-        name: 'new-template',
-        component: () => import('../views/NewTemplate.vue'),
-        meta: {
-            auth: true
-        }
-    },
+
     {
         path: '/newTemplate/:id',
         name: 'new-template',
