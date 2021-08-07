@@ -4,20 +4,20 @@
             <h1>{{workout.name}}</h1>
             <p>{{workout.description}}</p>
             <p class="small">{{since(workout.createdAt)}}<br/>({{date(workout.createdAt)}})</p>
-            <p class="small">{{since(previousWorkout.createdAt)}}<br/>({{date(previousWorkout.createdAt)}})</p>
+            <!-- <p class="small">{{since(previousWorkout.createdAt)}}<br/>({{date(previousWorkout.createdAt)}})</p> -->
         </div>
-        <div v-if="edit">
-             <div class="form">
-                <label for="name">Name</label>
-                <input id="name" required v-model="workout.name" name="name" />
-                <br/>
-                <label for="description">Description</label>
-                <input id="description" v-model="workout.description" name="description" />
-                <br/>
-                <span>
-                    <button @click="save">Save</button> 
-                </span>
-        </div>
+        <div v-if="edit" class="w-100">
+            <form>
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input  class="form-control" id="name" required v-model="workout.name" name="name"/>
+                </div>
+                <div class="form-group mt-3 mb-3">
+                    <label for="description">Description</label>
+                    <textarea rows="3" class="form-control" id="description" v-model="workout.description" name="description" />
+                </div>
+                <!-- <button type="submit" class="mt-3 btn btn-primary" @click="save">Save</button>  -->
+            </form>
         </div>
         <div>  
             <button @click="toggleEdit" class="btn btn-link">{{editButton}}</button>
@@ -39,19 +39,18 @@
 
             <div class="card-body">
                     <div class="sets">
-                        <ul>
-                            <li v-for="(set, setIndex) in item.sets" :key="setIndex">
-                                <span>Set {{setIndex+1}}</span>
-                                <div>
-                                    <span>{{previousData(item.name, setIndex)}}</span>
+                            <div class="set d-flex w-100 justify-content-between" v-for="(set, setIndex) in item.sets" :key="setIndex">
+                                <div class="d-flex align-items-center">
+                                    <span class="badge text-dark">Set {{setIndex+1}}</span>
+                                    <span class="badge text-dark">{{previousData(item.name, setIndex)}}</span>
                                 </div>
-                                <div>
+                                <div class="form-group">
                                     <label for="reps">Reps</label>
-                                    <input type="number" id="reps" required name="reps" ref="reps"  v-model="set.reps"/>
+                                    <input class="form-control" type="number" id="reps" required name="reps" ref="reps"  v-model="set.reps"/>
                                 </div>
-                                <div>
+                                <div class="form-group">
                                     <label for="weight">Weight</label>
-                                    <input type="number" id="weight" required name="weight" ref="weight" v-model="set.weight"/>
+                                    <input class="form-control" type="number" id="weight" required name="weight" ref="weight" v-model="set.weight"/>
                                 </div>
                                 <!-- lets skip this for now -->
                                 <!-- <div>
@@ -61,25 +60,30 @@
                                 <div v-if="edit">
                                     <button @click="removeSet(index, setIndex)" class="btn btn-danger btn-sm">x</button>
                                 </div>
-                            </li>
-                        </ul>
+                            </div>
                     </div>
-                    <button class="btn btn-outline-primary btn-block"  style="flex-grow:100; width:100%" @click="newSet(index)">Add a set</button>
+                    <button class="btn btn-outline-primary btn-block mt-3"  style="flex-grow:100; width:100%" @click="newSet(index)">Add a set</button>
                 </div>
             </div>
-    <div v-if="addExercise">
-            <label for="exerciseName">Exercise name</label>
-            <input id="exerciseName" required name="exerciseName" ref="exerciseName"/>
-            <br/>
-            <label for="notes">Notes</label>
-            <input id="notes" name="notes" ref="notes"/>
-    <button @click="addNewExercise" class="btn-block btn btn-outline-primary">Add</button>
+    <div v-if="addExercise" class="w-100">
+        <h3>New exercise</h3>
+        <form>
+            <div class="form-group">
+                <label for="exerciseName">Exercise name</label>
+                <input class="form-control" id="exerciseName" required name="exerciseName" ref="exerciseName"/>
+            </div>
+            <div class="form-group">
+                <label for="notes">Notes</label>
+                <textarea class="form-control" rows="3" id="notes" name="notes" ref="notes"/>
+            </div>
+        </form>
+    <button @click="addNewExercise" class="btn-block btn btn-primary mt-3 mb-3">Add</button>
     </div>
-    <button @click="toggleAddExercise" class="btn-block btn btn-primary" style="width:100%">{{addExerciseButtonText}}</button>
+    <button @click="toggleAddExercise" class="btn-block btn btn-outline-primary" style="width:100%">{{addExerciseButtonText}}</button>
 
 
     <div v-if="edit">
-        <button class="btn btn-danger" @click="remove">Delete workout</button>
+        <button class="btn btn-danger mt-3" @click="remove">Delete workout</button>
     </div>
 </template>
 
@@ -256,36 +260,24 @@
 </script>
 
 <style scoped>
-    .sets li {
-        width:100%; 
-        display: flex; 
-        flex-direction: row;
-        justify-content: center;
-        align-items: flex-end;
-    }
 
-    .sets li>div {
-        margin: 0px .25em;
-        display: flex; 
-        flex-direction: column;
-        flex-grow: 0;
-        width: 100%;
-        align-items: stretch;
+    .badge {
+        font-size: 13px; 
+        padding: .5em .75em; 
+        border-radius: 5px; 
+        background: #eee;
+        margin-right: .5em;
+        margin-top: 2em;
     }
-
-    .sets li input {
+    input {
+        margin-right: 1em !important;
+    }
+    /* .sets li input {
         font-size: 16px; 
         flex-grow: 0;
         width: 70px;
-    }
-    .sets li span {
-        text-align:center;
-        background: #eee; 
-        padding: .25em .5em; 
-        border-radius: .5em; 
-        font-size: 13px;
-        min-width:45px;
-    }
+    } */
+
 
 
 </style>

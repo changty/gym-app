@@ -1,5 +1,5 @@
 <template>
-   <h1>Welcome {{ state.name }}</h1>
+   <h1 class="mb-3">Welcome {{ state.name }}</h1>
 
    <!-- <h2>Templates</h2> -->
 <!-- <div class="templates">
@@ -22,19 +22,23 @@
 </div> -->
 
 
-    <h2>Workouts <button @click="emptyWorkout" class="btn btn-primary btn-sm">Add</button> </h2>  
-    <ul class="list-group ">
-        <li class="list-group-item" @click="openWorkout(item.id)" v-for="(item, index) in sortedWorkouts()" :key="item.id">
-            <div class="d-flex w-100 justify-content-between">
-                <h5 class="mb-1">{{item.name}}</h5>
-                    <small>{{since(item.createdAt)}}</small><br/>
-                    <button class="btn btn-outline-primary btn-sm" @click.self="createWorkout(index)">Copy as a new workout</button><br/>
-                    <button class="btn btn-outline-primary btn-sm" @click.self="openWorkout(item.id)">Open</button>
+    <h2 class="d-flex justify-content-between">Workouts <button @click="emptyWorkout" class="btn btn-outline-success btn-sm">Add</button> </h2>  
+        <div class="card mb-2" @click="openWorkout(item.id)" v-for="(item, index) in sortedWorkouts()" :key="item.id">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <h5 class="card-title">{{item.name}}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        <small>{{since(item.createdAt)}}</small><br/>
+                        <small>{{date(item.createdAt)}}</small>
+                    </h6>
+                </div>
+                <p class="card-text">{{item.description}}</p>
+
+                <button class="btn btn-primary btn-sm" @click.self="createWorkout(index)">Copy as a new workout</button>
+                <button class="btn btn-link btn-sm" @click.self="openWorkout(item.id)">Open</button>
             </div>
-            <p class="mb-1">{{item.description}}</p>
-            <small>{{date(item.createdAt)}}</small>
-        </li>
-    </ul>
+        </div>
+
 </template>
 
 <script>
@@ -64,13 +68,16 @@
 
         methods: {
             sortedWorkouts() {
-                return this.state.workouts.sort((a,b) => (a.createdAt > b.createdAt) ? -1 : ((b.createdAt > a.createdAt) ? 1 : 0)); 
+                if(this.state.workouts) {
+                    return this.state.workouts.sort((a,b) => (a.createdAt > b.createdAt) ? -1 : ((b.createdAt > a.createdAt) ? 1 : 0)); 
+                }
+                return []
             }, 
             since(time) {
                 return moment(time).fromNow(); 
             },
             date(time) {
-                return moment(time).format('MMMM Do YYYY, h:mm:ss')
+                return moment(time).format('MMMM Do YYYY, h:mm')
             },
             openTemplate(itemId) {
                 router.push('/newTemplate/' + itemId)
@@ -112,35 +119,5 @@
 </script>
 
 <style scoped>
-.templates {
-    display: flex;
-    flex-direction: row; 
-    flex-wrap: nowrap; 
-    overflow-x:auto;
-    scroll-snap-type: x proximity;
-    scroll-padding: 25%;
-    width: auto;
-    margin-bottom: 1em;
-}
-.templates .card {
-    min-width: 12rem; 
-    scroll-snap-align: start;
-}
 
-.card.new {
-    min-width: 10rem; 
-    width: 10rem; 
-    background: #eee !important;
-}
-
-.card .btn {
-    margin-right: 1rem; 
-}
-
-.card {
-    cursor: pointer;
-    width: 12rem;
-    min-width: 12rem; 
-    margin: 1em; 
-}
 </style>
