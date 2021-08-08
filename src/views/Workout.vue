@@ -1,29 +1,53 @@
 <template>
-    <div class="d-flex w-100 justify-content-between mt-3 mb-3">
-        <div v-if="!edit">
-            <h1>{{workout.name}}</h1>
-            <p>{{workout.description}}</p>
-            <p class="small">{{since(workout.createdAt)}}<br/>({{date(workout.createdAt)}})</p>
-            <!-- <p class="small">{{since(previousWorkout.createdAt)}}<br/>({{date(previousWorkout.createdAt)}})</p> -->
-        </div>
-        <div v-if="edit" class="w-100">
-            <form>
-                <div class="form-group">
-                    <label for="name">Name</label>
-                    <input  class="form-control" id="name" required v-model="workout.name" name="name"/>
+    <div class="card card-primary mb-3">
+        <div class="card-body">
+            <div class="d-flex w-100 justify-content-between mt-3 mb-3">
+                <div v-if="!edit">
+                    <h1>{{workout.name}}</h1>
+                    <p>{{workout.description}}</p>
+                    <p class="small">{{since(workout.createdAt)}}<br/>({{date(workout.createdAt)}})</p>
+                    <!-- <p class="small">{{since(previousWorkout.createdAt)}}<br/>({{date(previousWorkout.createdAt)}})</p> -->
+
                 </div>
-                <div class="form-group mt-3 mb-3">
-                    <label for="description">Description</label>
-                    <textarea rows="3" class="form-control" id="description" v-model="workout.description" name="description" />
+                <div v-if="edit" class="w-100">
+                    <form>
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input  class="form-control" id="name" required v-model="workout.name" name="name"/>
+                        </div>
+                        <div class="form-group mt-3 mb-3">
+                            <label for="description">Description</label>
+                            <textarea rows="3" class="form-control" id="description" v-model="workout.description" name="description" />
+                        </div>
+                        <!-- <button type="submit" class="mt-3 btn btn-primary" @click="save">Save</button>  -->
+                    </form>
                 </div>
-                <!-- <button type="submit" class="mt-3 btn btn-primary" @click="save">Save</button>  -->
-            </form>
-        </div>
-        <div>  
-            <button @click="toggleEdit" class="btn btn-link">{{editButton}}</button>
+                <div>  
+                    <button @click="toggleEdit" class="btn btn-link">{{editButton}}</button>
+                </div>
+            </div>
+            <button class="btn btn-primary text-center w-100">Total volume: {{ workoutTotalVolume() }}</button>
         </div>
     </div>
 
+
+      <div v-if="addExercise" class="card w-100 mb-3">
+          <div class="card-body">
+                <h3>New exercise</h3>
+                <form>
+                    <div class="form-group">
+                        <label for="exerciseName">Exercise name</label>
+                        <input class="form-control" id="exerciseName" required name="exerciseName" ref="exerciseName"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="notes">Notes</label>
+                        <textarea class="form-control" rows="3" id="notes" name="notes" ref="notes"/>
+                    </div>
+                </form>
+            <button @click="addNewExercise" class="btn-block btn btn-primary mt-3 mb-3">Add</button>
+            </div>
+    </div>
+    <button @click="toggleAddExercise" class="btn-block btn btn-outline-primary mb-3" style="width:100%">{{addExerciseButtonText}}</button>
 
 
         <div class="card mb-5 shadow-sm" v-for="(item, index) in workout.exercises" :key="item.name">
@@ -39,10 +63,16 @@
 
             <div class="card-body">
                     <div class="sets">
-                            <div class="set d-flex w-100 justify-content-between" v-for="(set, setIndex) in item.sets" :key="setIndex">
+                            <div class="set d-flex w-100 justify-content-between align-items-center" v-for="(set, setIndex) in item.sets" :key="setIndex">
                                 <div class="d-flex align-items-center">
-                                    <span class="badge text-dark">Set {{setIndex+1}}</span>
-                                    <span class="badge text-dark">{{previousData(item.name, setIndex)}}</span>
+                                    <div class="form-group">
+                                        <label for="set">&nbsp;</label><br/>
+                                        <span name="set" class="badge badge-primary">Set {{setIndex+1}}</span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="previousData">Previous</label><br/>
+                                        <span name="previousData" class="badge">{{previousData(item.name, setIndex)}}</span>
+                                    </div>
                                 </div>
                                 <div class="form-group">
                                     <label for="reps">Reps</label>
@@ -57,29 +87,15 @@
                                     <label for="rest">Rest</label>
                                     <input type="number" id="rest" required name="rest" ref="rest"  v-model="set.rest"/>
                                 </div> -->
-                                <div v-if="edit">
-                                    <button @click="removeSet(index, setIndex)" class="btn btn-danger btn-sm">x</button>
+                                <div v-if="edit" class="mt-4">
+                                    <button v-if="edit" @click="removeSet(index, setIndex)" class="btn btn-danger icon-only-rounded btn-sm">x</button>
                                 </div>
                             </div>
                     </div>
                     <button class="btn btn-outline-primary btn-block mt-3"  style="flex-grow:100; width:100%" @click="newSet(index)">Add a set</button>
                 </div>
             </div>
-    <div v-if="addExercise" class="w-100">
-        <h3>New exercise</h3>
-        <form>
-            <div class="form-group">
-                <label for="exerciseName">Exercise name</label>
-                <input class="form-control" id="exerciseName" required name="exerciseName" ref="exerciseName"/>
-            </div>
-            <div class="form-group">
-                <label for="notes">Notes</label>
-                <textarea class="form-control" rows="3" id="notes" name="notes" ref="notes"/>
-            </div>
-        </form>
-    <button @click="addNewExercise" class="btn-block btn btn-primary mt-3 mb-3">Add</button>
-    </div>
-    <button @click="toggleAddExercise" class="btn-block btn btn-outline-primary" style="width:100%">{{addExerciseButtonText}}</button>
+  
 
 
     <div v-if="edit">
@@ -134,6 +150,17 @@
                 return sum
 
             }, 
+
+            workoutTotalVolume() {
+                let sum = 0; 
+                for(let i=0; i<this.workout.exercises.length; i++) {
+                    for(let j=0; j<this.workout.exercises[i].sets.length; j++) {
+                        sum += this.workout.exercises[i].sets[j].weight*this.workout.exercises[i].sets[j].reps
+                    }
+                }
+                return sum; 
+            },
+
             getWorkout() {
                 // Filter this workout from shared state workouts
                 this.workout = this.state.workouts.find(w => w.id === this.id)
@@ -261,16 +288,20 @@
 
 <style scoped>
 
-    .badge {
-        font-size: 13px; 
-        padding: .5em .75em; 
-        border-radius: 5px; 
-        background: #eee;
-        margin-right: .5em;
-        margin-top: 2em;
+    .badge-primary {
+        background: rgb(106,205,165) !important; 
+        color: rgb(241,241,241) !important;
     }
-    input {
-        margin-right: 1em !important;
+    .badge {
+        font-size: 16px; 
+        padding: .5rem .75rem; 
+        border-radius: 5px; 
+        background: rgb(56,55,66);
+        margin-right: .5em;
+        width: 75px;
+    }
+    .form-group {
+        margin-right: .5rem !important;
     }
     /* .sets li input {
         font-size: 16px; 
