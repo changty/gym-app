@@ -31,10 +31,10 @@
         </div>
     </div>
 
-    <div class="card mb-2" @click="openWorkout(item.id)" v-for="(item, index) in sortedWorkouts()" :key="item.id">
+    <div class="card mb-2 " @click="openWorkout(item.id)" v-for="(item, index) in sortedWorkouts()" :key="item.id">
         <div class="card-body">
             <div class="d-flex justify-content-between">
-                <h5 class="card-title">{{item.name}}</h5>
+                <h5 :class="'card-title ' +  item.color +'-txt'">{{item.name}}</h5>
                 <h6 class="card-subtitle mb-2 text-muted">
                     <small>{{since(item.createdAt)}}</small><br/>
                     <small>{{date(item.createdAt)}}</small>
@@ -60,6 +60,8 @@
 
         data() {
             return {
+                color: 0,
+                colors: ['green-txt', 'red-txt', 'blue-txt', 'yellow-txt'],
                 state: this.$root.$data.sharedState,
             }
         },
@@ -77,6 +79,12 @@
         },
 
         methods: {
+            nextColor() {
+                if(this.color > this.colors.length-1) {
+                    this.color = 0; 
+                }
+                return this.colors[this.color++];
+            },
             sortedWorkouts() {
                 if(this.state.workouts) {
                     return this.state.workouts.sort((a,b) => (a.createdAt > b.createdAt) ? -1 : ((b.createdAt > a.createdAt) ? 1 : 0)); 

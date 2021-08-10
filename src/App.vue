@@ -1,6 +1,6 @@
 <template>
 <nav class="navbar navbar-expand-lg justify-content-between align-items-center">
-  <div v-if="$route.name !== 'home'">
+  <div v-if="$route.name !== 'home' && $route.name !== 'login'  ">
     <button class="btn btn-outline-light text-light btn-sm" @click="back">Back</button>
   </div>
   <div v-if="$route.name === 'home'">
@@ -8,8 +8,8 @@
   </div>
 
 
-  <h5 style="text-align: center; padding:0; margin:0;">Gym app</h5>
-  <div v-if="sharedState.isLoggedIn">
+  <h5 style="text-align: center; padding:0; margin:0; width: auto; flex-grow: 1;">Gym app</h5>
+  <div v-if="sharedState.isLoggedIn && $route.name !== 'login'">
     <button @click="signOut" class="btn btn-outline-danger btn-sm">Logout</button>
   </div>
 </nav>
@@ -50,13 +50,14 @@ export default {
   name: 'App',
   mounted() {
       auth.onAuthStateChanged((user) => {
+        console.log(user); 
         if (user) {
           this.sharedState.isLoggedIn = true // if we have a user
           this.sharedState.name = user.displayName
           this.sharedState.email = user.email
         } else {
           this.sharedState.isLoggedIn = false // if we do not
-          this.router.push('/login');
+          router.push('/login');
           this.sharedState.name = ""
           this.sharedState.email = ""
         }
@@ -197,5 +198,39 @@ textarea.form-control {
   width: 100%; 
   height: 60px; 
   background: black; 
+}
+
+.green {
+  background: #6acda5 !important; 
+  color: rgb(241,241,241) !important;;
+}
+
+.blue {
+  background: #6aaacd !important;; 
+  color: rgb(241,241,241) !important;;
+}
+
+.red {
+  background: #cd6a92 !important;; 
+  color: rgb(241,241,241) !important;;
+}
+.yellow {
+  background: #cda56a !important;; 
+  color: rgb(241,241,241) !important;;
+}
+
+.green-txt {
+  color: #6acda5 !important; 
+}
+
+.blue-txt {
+  color: #6aaacd !important;; 
+}
+
+.red-txt {
+  color: #cd6a92 !important;; 
+}
+.yellow-txt {
+  color: #cda56a !important;; 
 }
 </style>

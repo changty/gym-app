@@ -1,9 +1,20 @@
 
 <template>
-   <h1>Login</h1>
-    <button @click="googleSignIn">
+<br/><br/>
+   <h1 class="text-center">Login to get started</h1>
+   <br/>
+    <!-- <button @click="googleSignIn">
       Login In with Google
-    </button>
+    </button> -->
+
+    <div class="d-flex justify-content-center">
+
+            <a @click="googleSignIn" href="#" class="btn btn-outline-dark login-button" role="button" style="text-transform:none">
+                <img style="width: 35px; margin-bottom:3px; margin-right:5px" alt="Google sign-in" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png" />
+                Login with Google
+            </a>
+
+    </div>
 </template>
 
 <script>
@@ -35,3 +46,15 @@ import router from '../router';
         }
     }
 </script>
+
+<style scoped>
+.login-button {
+
+    font-size: 30px;
+    width: 350px !important;
+    background: white;
+}
+.login-button:hover {
+    color: #333;
+}
+</style>

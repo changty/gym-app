@@ -1,5 +1,5 @@
 <template>
-    <div class="card card-primary mb-3">
+    <div :class="'card mb-3 ' + workout.color">
         <div class="card-body">
             <div class="d-flex w-100 justify-content-between mt-3 mb-3">
                 <div v-if="!edit">
@@ -9,7 +9,7 @@
                     <!-- <p class="small">{{since(previousWorkout.createdAt)}}<br/>({{date(previousWorkout.createdAt)}})</p> -->
 
                 </div>
-                <div v-if="edit" class="w-100">
+                <div v-if="edit" class="w-50">
                     <form>
                         <div class="form-group">
                             <label for="name">Name</label>
@@ -18,6 +18,15 @@
                         <div class="form-group mt-3 mb-3">
                             <label for="description">Description</label>
                             <textarea rows="3" class="form-control" id="description" v-model="workout.description" name="description" />
+                        </div>
+
+                        <div class="form-group">
+                            <div class="btn-group" role="group" aria-label="color">
+                                <button @click="setColor('green')" type="button" class="btn green btn-sm">Green</button>
+                                <button @click="setColor('red')" type="button" class="btn red btn-sm">Red</button>
+                                <button @click="setColor('blue')" type="button" class="btn blue btn-sm">Blue</button>
+                                <button @click="setColor('yellow')" type="button" class="btn yellow btn-sm">Yellow</button>
+                            </div>
                         </div>
                         <!-- <button type="submit" class="mt-3 btn btn-primary" @click="save">Save</button>  -->
                     </form>
@@ -116,7 +125,9 @@
                 edit: false,
                 editButton: "edit",
                 id: null,
-                workout: {},
+                workout: {
+                    color: 'green',
+                },
                 previousWorkout: {},
                 allWorkouts: {},
                 state: this.$root.$data.sharedState
@@ -185,6 +196,10 @@
                 }
 
             },
+            setColor(color) {
+                this.workout.color = color; 
+                this.save
+            },
             remove() {
                 WorkoutDataService.deleteWorkout(this.id)
                 .then(() => {
@@ -199,7 +214,8 @@
                 let toSave = {
                     name: this.workout.name,
                     description: this.workout.description,
-                    exercises: this.workout.exercises
+                    exercises: this.workout.exercises,
+                    color: this.workout.color
                 }
 
                 if(this.id !== null) {

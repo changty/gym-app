@@ -21,8 +21,7 @@ const routes = [
         meta: {
             auth: true
         }
-  },
-
+    },
     {
         path: '/newTemplate/:id',
         name: 'new-template',
