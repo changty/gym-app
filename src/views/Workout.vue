@@ -59,7 +59,7 @@
     <button @click="toggleAddExercise" class="btn-block btn btn-outline-primary mb-3" style="width:100%">{{addExerciseButtonText}}</button>
 
 
-        <div class="card mb-5 shadow-sm" v-for="(item, index) in workout.exercises" :key="item.name">
+        <div class="card mb-2 shadow-sm" v-for="(item, index) in workout.exercises" :key="item.name">
             <div class="card-header d-flex w-100 justify-content-between">
                 <div>
                     <b>{{item.name}} ({{item.sets.length}} sets)</b>
@@ -105,7 +105,7 @@
                 </div>
             </div>
   
-
+n
 
     <div v-if="edit">
         <button class="btn btn-danger mt-3" @click="remove">Delete workout</button>

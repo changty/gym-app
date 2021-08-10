@@ -50,7 +50,6 @@ export default {
   name: 'App',
   mounted() {
       auth.onAuthStateChanged((user) => {
-        console.log(user); 
         if (user) {
           this.sharedState.isLoggedIn = true // if we have a user
           this.sharedState.name = user.displayName
@@ -94,6 +93,8 @@ html, body {
   background: #000;
   color: rgb(241,241,241);
   padding: 0rem 1rem;
+  height: 60px; 
+  margin-bottom: 1rem; 
 }
 
 #app {
