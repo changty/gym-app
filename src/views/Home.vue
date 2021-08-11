@@ -1,5 +1,5 @@
 <template>
-    <div class="card card-primary mb-3">
+    <div class="card green mb-3">
         <div class="card-body">
             <h1 class="mb-3">Welcome {{ state.name }}</h1>
 
@@ -31,10 +31,10 @@
         </div>
     </div>
 
-    <div class="card mb-2 " @click="openWorkout(item.id)" v-for="(item, index) in sortedWorkouts()" :key="item.id">
+    <div class="card mb-2 pointer" @click="openWorkout(item.id)" v-for="(item, index) in sortedWorkouts()" :key="item.id">
         <div class="card-body">
             <div class="d-flex justify-content-between">
-                <h5 :class="'card-title ' +  item.color +'-txt'">{{item.name}}</h5>
+                <h5 :class="'link card-title ' +  item.color +'-txt'">{{item.name}}</h5>
                 <h6 class="card-subtitle mb-2 text-muted">
                     <small>{{since(item.createdAt)}}</small><br/>
                     <small>{{date(item.createdAt)}}</small>
@@ -43,8 +43,8 @@
             <p class="card-text">{{item.description}}</p>
 
             <div class="button-container text-center mt-5">
-                <button class="btn btn-link" @click.self="openWorkout(item.id)">Open</button><br/>
-                <button class="btn btn-primary" @click.self="createWorkout(index)">Copy as a new workout</button>
+                <!-- <button class="btn btn-link" @click.self="openWorkout(item.id)">Open</button><br/> -->
+                <button class="btn btn-primary" @click.stop="createWorkout(index)">Copy as a new workout</button>
             </div>
         </div>
     </div>
@@ -97,17 +97,10 @@
             date(time) {
                 return moment(time).format('MMMM Do YYYY, h:mm')
             },
-            openTemplate(itemId) {
-                router.push('/newTemplate/' + itemId)
-            },
             openWorkout(itemId) {
                 router.push('/workout/' + itemId)
             },
-            addNewTemplate: function() {
-                router.push("/newTemplate")        
-            },
-           
-            getWorkouts() {
+            getWorkouts(forward) {
                 WorkoutDataService.getWorkouts(this.state.email)
                 .get() 
                 .then( querySnapshot => {
@@ -118,12 +111,36 @@
                             }
                         )
                     this.state.workouts = documents.sort((a,b) => (a.createdAt > b.createdA) ? 1 : ((b.createdAt > a.createdAt) ? -1 : 0)); 
+
+                    if(forward !== undefined) {
+                        router.push('/workout/' + forward)
+                    }
                 });
             },
             createWorkout(index) {
-                let toCopy = this.state.workouts[index] 
-                toCopy.createdAt = Date.now()
-                WorkoutDataService.createWorkout({...toCopy, template: toCopy.id})
+                let toCopy = {
+                    name: this.state.workouts[index].name,
+                    description: this.state.workouts[index].description, 
+                    owner: this.state.workouts[index].owner,
+                    template: this.state.workouts[index].id,
+                    color: this.state.workouts[index].color,
+                    createdAt: Date.now(),
+                    exercises: this.state.workouts[index].exercises
+                }
+                console.log(toCopy);
+                toCopy.exercises.forEach(exercise => {
+                    exercise.sets.forEach(set => {
+                        set.weight = 0; 
+                    })
+                })
+                
+                WorkoutDataService.createWorkout(toCopy)
+                    .then(doc => {
+                        this.getWorkouts(doc.id)
+                    })
+                    .catch(e => {
+                        console.log("error creating an exercise", e)
+                    })
             },
 
             emptyWorkout() {

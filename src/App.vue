@@ -78,20 +78,20 @@ export default {
 <style>
 
 h1,h2,h3,h4,h5,h6,p {
-    color: rgb(241,241,241);
+  color: rgba(255,255,255,.87);
 }
 
 html, body {
   margin: 0;
   padding:0;
-  color: rgb(241,241,241);
-  background: #000 !important;
+  color: rgba(255,255,255,.87);
+  background: #121212 !important;
   padding-bottom: 2rem;
   margin-bottom: 60px; 
 }
 .navbar {
   background: #000;
-  color: rgb(241,241,241);
+  color: rgba(255,255,255,.87);
   padding: 0rem 1rem;
   height: 60px; 
   margin-bottom: 1rem; 
@@ -101,15 +101,19 @@ html, body {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #000;
+  background: #121212;
 }
 
 .card {
-  background: rgb(26,25,32) !important; 
-  color: rgb(241,241,241);
+  background: rgba(255,255,255, .05) !important; 
+  color: rgba(255,255,255,.87);
   border: 0px solid white; 
   border-radius: 1rem !important;
   padding: 1.25rem 1.5rem;
+}
+
+.card.lift {
+  background: rgba(255,255,255,.12) !important;
 }
 
  @media only screen and (max-width: 400px) {
@@ -126,7 +130,7 @@ html, body {
 
 
 .text-muted {
-  color:rgba(117,117,108) !important;
+    color: rgba(255,255,255,.6);
 }
 
 button.btn {
@@ -135,21 +139,21 @@ button.btn {
   padding: .75rem 1.5rem !important;
 }
 .btn-link {
-    color: rgb(241,241,241) !important;
+    color: rgba(255,255,255,.87) !important;
 
 }
 .btn-primary {
-  background: rgb(106,205,165) !important;
-  border:1px solid rgb(106,205,165) !important; 
+  background: rgb(122,222,196) !important;
+  border:1px solid rgb(122,222,196) !important; 
 }
 
 .btn-outline-primary {
-    border:1px solid rgb(106,205,165) !important; 
+    border:1px solid rgb(122,222,196) !important; 
     background: none; 
-    color: rgb(241,241,241) !important;
+    color: rgba(255,255,255,.87) !important;
 }
 .btn-outline-primary:hover {
-  background: rgb(106,205,165) !important; 
+  background: rgb(122,222,196) !important; 
 }
 
 button.btn.icon-only-rounded {
@@ -168,27 +172,23 @@ button.btn.icon-only-rounded.btn-sm {
   line-height: .5rem !important; 
 }
 
-.card-primary .btn-primary {
+.card.green .btn-primary {
   background: #fff !important; 
-  color: rgb(106,205,165) !important; 
+  color: rgb(122,222,196) !important; 
 } 
-.card-primary .btn-outline-primary {
+.card.green .btn-outline-primary {
   border-color: #fff !important; 
 } 
-.card-primary .btn-outline-primary:hover {
+.card.green .btn-outline-primary:hover {
   background: #fff !important; 
-  color: rgb(106,205,165) !important; 
-}
-
-.card-primary {
-  background: rgb(106,205,165) !important; 
+  color: rgb(122,222,196) !important; 
 }
 
 input.form-control,
 textarea.form-control {
   background: rgb(44,42,51) !important;
   border: 1px solid black !important;
-  color: rgb(241,241,241) !important;
+  color: rgba(255,255,255,.87) !important;
 
 }
 .footer {
@@ -202,36 +202,76 @@ textarea.form-control {
 }
 
 .green {
-  background: #6acda5 !important; 
-  color: rgb(241,241,241) !important;;
+  background: rgb(122,222,196) !important; 
+  color: rgba(255,255,255,.87) !important;
+  color: #121212 !important;
 }
 
 .blue {
   background: #6aaacd !important;; 
-  color: rgb(241,241,241) !important;;
+  color: rgba(255,255,255,.87) !important;
+  color: #121212 !important;
 }
 
 .red {
-  background: #cd6a92 !important;; 
-  color: rgb(241,241,241) !important;;
+  background: #cd6a92 !important;
+  color: rgba(255,255,255,.87) !important;
+  color: #121212 !important;
 }
 .yellow {
-  background: #cda56a !important;; 
-  color: rgb(241,241,241) !important;;
+  background: #cda56a !important;
+  color: rgba(255,255,255,.87) !important;
+  color: #121212 !important;
 }
 
-.green-txt {
-  color: #6acda5 !important; 
+.green-txt,
+.green-txt h1,
+.green-txt h2, 
+.green-txt h3,
+.green-txt h4,
+.green-txt h5,
+.green-txt p {
+  color: rgb(122,222,196) !important; 
 }
 
-.blue-txt {
+.blue-txt,
+.blue-txt h1,
+.blue-txt h2, 
+.blue-txt h3,
+.blue-txt h4,
+.blue-txt h5,
+.blue-txt p {
   color: #6aaacd !important;; 
 }
 
-.red-txt {
+.red-txt,
+.red-txt h1,
+.red-txt h2, 
+.red-txt h3,
+.red-txt h4,
+.red-txt h5,
+.red-txt p {
   color: #cd6a92 !important;; 
 }
-.yellow-txt {
+.yellow-txt,
+.yellow-txt h1,
+.yellow-txt h2, 
+.yellow-txt h3,
+.yellow-txt h4,
+.yellow-txt h5,
+.yellow-txt p {
   color: #cda56a !important;; 
+}
+
+.pointer {
+  cursor: pointer;
+}
+.dark-text {
+   color: #121212 !important;
+
+}
+.link {
+  text-decoration: underline;
+  cursor:pointer;
 }
 </style>

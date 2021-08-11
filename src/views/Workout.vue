@@ -1,9 +1,9 @@
 <template>
-    <div :class="'card mb-3 ' + workout.color">
+    <div :class="'lift card mb-3 '">
         <div class="card-body">
             <div class="d-flex w-100 justify-content-between mt-3 mb-3">
                 <div v-if="!edit">
-                    <h1>{{workout.name}}</h1>
+                    <h1 :class="workout.color+'-txt'">{{workout.name}}</h1>
                     <p>{{workout.description}}</p>
                     <p class="small">{{since(workout.createdAt)}}<br/>({{date(workout.createdAt)}})</p>
                     <!-- <p class="small">{{since(previousWorkout.createdAt)}}<br/>({{date(previousWorkout.createdAt)}})</p> -->
@@ -30,6 +30,9 @@
                         </div>
                         <!-- <button type="submit" class="mt-3 btn btn-primary" @click="save">Save</button>  -->
                     </form>
+                    
+                    <button class="btn btn-danger mt-3" @click="remove">Delete workout</button>
+
                 </div>
                 <div>  
                     <button @click="toggleEdit" class="btn btn-link">{{editButton}}</button>
@@ -60,15 +63,30 @@
 
 
         <div class="card mb-2 shadow-sm" v-for="(item, index) in workout.exercises" :key="item.name">
-            <div class="card-header d-flex w-100 justify-content-between">
+            <div v-if="!item.edit" class="card-header d-flex w-100 justify-content-between">
                 <div>
                     <b>{{item.name}} ({{item.sets.length}} sets)</b>
                     <p class="card-text">{{item.notes}}</p>
                 </div>
                 <div>
-                    <p>Total volume: {{ totalVolume(index) }}</p>
+                    <span>Total volume: {{ totalVolume(index) }}</span><br/>
+                    <p @click="item.edit=!item.edit" class="text-muted link">Edit</p>
                 </div>
             </div>
+            <div v-if="item.edit" class="card-header d-flex w-100 justify-content-between">
+                     <form>
+                        <div class="form-group">
+                            <label for="exerciseName">Exercise name</label>
+                            <input class="form-control" id="exerciseName" required name="exerciseName" ref="exerciseName" v-model="item.name"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="notes">Notes</label>
+                            <textarea class="form-control" rows="3" id="notes" name="notes" ref="notes" v-model="item.notes"/>
+                        </div>
+                    </form>
+                     <p @click="item.edit=!item.edit" class="text-muted link">Save</p>
+
+                </div>
 
             <div class="card-body">
                     <div class="sets">
@@ -80,7 +98,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="previousData">Previous</label><br/>
-                                        <span name="previousData" class="badge">{{previousData(item.name, setIndex)}}</span>
+                                        <span name="previousData" class="badge previous">{{previousData(item.name, setIndex)}}</span>
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -104,12 +122,6 @@
                     <button class="btn btn-outline-primary btn-block mt-3"  style="flex-grow:100; width:100%" @click="newSet(index)">Add a set</button>
                 </div>
             </div>
-  
-n
-
-    <div v-if="edit">
-        <button class="btn btn-danger mt-3" @click="remove">Delete workout</button>
-    </div>
 </template>
 
 <script>
@@ -186,7 +198,7 @@ n
             getSimilarWorkouts() {
 
                 let filtered = []; 
-                filtered = this.state.workouts.filter(w => w.template === this.workout.template); 
+                filtered = this.state.workouts.filter(w => (w.template === this.workout.template || w.id === this.workout.template)); 
                 // sort from newest to oldest
                 filtered = filtered.sort((a,b) => (a.createdAt > b.createdAt) ? -1 : ((b.createdAt > a.createdAt) ? 1 : 0))
                 this.allWorkouts = filtered; 
@@ -304,17 +316,21 @@ n
 
 <style scoped>
 
-    .badge-primary {
-        background: rgb(106,205,165) !important; 
-        color: rgb(241,241,241) !important;
+    .badge.badge-primary {
+        background: rgb(122,222,196) !important; 
+        color:#121212 !important;
     }
     .badge {
         font-size: 16px; 
         padding: .5rem .75rem; 
         border-radius: 5px; 
-        background: rgb(56,55,66);
+        background: rgba(255,255,255,.12);
         margin-right: .5em;
-        width: 75px;
+        color:rgba(255,255,255,.60) !important;
+        width: 50px !important;
+    }
+    .badge.previous {
+        width: 80px!important; 
     }
     .form-group {
         margin-right: .5rem !important;
