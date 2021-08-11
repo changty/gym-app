@@ -145,6 +145,15 @@
                 state: this.$root.$data.sharedState
             }
         },
+    
+        watch: {
+            workout: {
+                handler() {
+                    this.save()
+                },
+                deep: true
+            }
+        },
 
         created() {
             if(this.$route.params.id === "new") {

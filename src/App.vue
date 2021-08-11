@@ -112,11 +112,19 @@ html, body {
   padding: 1.25rem 1.5rem;
 }
 
+.card label {
+  color: rgba(255,255,255,.6) !important;
+}
+
 .card.lift {
   background: rgba(255,255,255,.12) !important;
 }
 
- @media only screen and (max-width: 400px) {
+.badge {
+  height: 36px; 
+  padding-top: 12px !important;
+}
+ @media only screen and (max-width: 600px) {
    .card {
      padding: .25rem .25rem;
      font-size: 13px !important; 
@@ -145,6 +153,7 @@ button.btn {
 .btn-primary {
   background: rgb(122,222,196) !important;
   border:1px solid rgb(122,222,196) !important; 
+  color: #121212 !important;
 }
 
 .btn-outline-primary {
