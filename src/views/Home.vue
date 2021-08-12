@@ -41,7 +41,7 @@
                 </h6>
             </div>
             <p class="card-text">{{item.description}}</p>
-
+            <h4>Volume: {{workoutTotalVolume(index)}}</h4>
             <div class="button-container text-center mt-5">
                 <!-- <button class="btn btn-link" @click.self="openWorkout(item.id)">Open</button><br/> -->
                 <button class="btn btn-primary" @click.stop="createWorkout(index)">Copy as a new workout</button>
@@ -79,6 +79,47 @@
         },
 
         methods: {
+            workoutTotalVolume(index) {
+                let sum = 0; 
+                for(let i=0; i<this.state.workouts[index].exercises.length; i++) {
+                    for(let j=0; j<this.state.workouts[index].exercises[i].sets.length; j++) {
+                        sum += this.state.workouts[index].exercises[i].sets[j].weight*this.state.workouts[index].exercises[i].sets[j].reps
+                    }
+                }
+                
+                let sum2 = 0; 
+                let workout = this.getPreviousWorkout(index)
+                if(workout) {
+
+                    for(let i=0; i<workout.exercises.length; i++) {
+                        for(let j=0; j<workout.exercises[i].sets.length; j++) {
+                            sum2 += workout.exercises[i].sets[j].weight*workout.exercises[i].sets[j].reps
+                        }
+                    }
+                
+                }
+                let diff = sum-sum2
+                if(diff > 0 && sum2 > 0) {
+                    return "+" + diff
+                }
+                return sum-sum2
+
+
+            },
+            getPreviousWorkout(index) {
+                let filtered = []; 
+                let workout = this.state.workouts[index]
+                let key = workout.template || workout.id
+
+                filtered = this.state.workouts.filter(w => (w.template === key || w.id === key)); 
+                // sort from newest to oldest
+                filtered = filtered.sort((a,b) => (a.createdAt > b.createdAt) ? -1 : ((b.createdAt > a.createdAt) ? 1 : 0))
+                
+                // get previous workout, if there are any
+                if(filtered.length > 1 && filtered[1].createdAt < workout.createdAt) {
+                    return filtered[1]
+                }
+            },
             nextColor() {
                 if(this.color > this.colors.length-1) {
                     this.color = 0; 

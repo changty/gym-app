@@ -38,7 +38,7 @@
                     <button @click="toggleEdit" class="btn btn-link">{{editButton}}</button>
                 </div>
             </div>
-            <button class="btn btn-primary text-center w-100">Total volume: {{ workoutTotalVolume() }}</button>
+            <button class="btn btn-primary text-center w-100">Volume: {{ volumeDifference() }}</button>
         </div>
     </div>
 
@@ -62,15 +62,15 @@
     <button @click="toggleAddExercise" class="btn-block btn btn-outline-primary mb-3" style="width:100%">{{addExerciseButtonText}}</button>
 
 
-        <div class="card mb-2 shadow-sm" v-for="(item, index) in workout.exercises" :key="item.name">
+        <div @click="toggleActive(item)" :class="'card mb-2 shadow-sm ' + item.active" v-for="(item, index) in workout.exercises" :key="item.name">
             <div v-if="!item.edit" class="card-header d-flex w-100 justify-content-between">
                 <div>
                     <b>{{item.name}} ({{item.sets.length}} sets)</b>
                     <p class="card-text">{{item.notes}}</p>
+                    <p @click="item.edit=!item.edit" class="text-muted link">Edit</p>
                 </div>
                 <div>
-                    <span>Total volume: {{ totalVolume(index) }}</span><br/>
-                    <p @click="item.edit=!item.edit" class="text-muted link">Edit</p>
+                    <span>Volume: {{ totalExerciseVolume(index) }}/</span><span class="text-muted">{{previousExerciseVolume(index)}}</span><br/>
                 </div>
             </div>
             <div v-if="item.edit" class="card-header d-flex w-100 justify-content-between">
@@ -171,7 +171,15 @@
         },
 
         methods: {
-            totalVolume(index) {
+            toggleActive(item) {
+                if(item.active && item.active.length > 0) {
+                    item.active = ''
+                }
+                else {
+                    item.active = 'lift'
+                }
+            },
+            totalExerciseVolume(index) {
                 let sets =  this.workout.exercises[index].sets
                 let sum = 0; 
                 for(let i=0; i<sets.length; i++) {
@@ -182,6 +190,43 @@
                 return sum
 
             }, 
+
+            previousExerciseVolume(index) {
+                let sum = 0; 
+
+                if(this.previousWorkout && this.previousWorkout.exercises !== undefined && this.previousWorkout.exercises[index])  {
+                    let sets =  this.previousWorkout.exercises[index].sets
+                    for(let i=0; i<sets.length; i++) {
+                        let set = sets[i];
+                        sum += set.weight*set.reps
+                    }
+                    return sum
+                }
+
+            },
+
+            previousWorkoutTotalVolume() {
+                let sum = 0; 
+                if(this.previousWorkout && this.previousWorkout.exercises) {
+                    for(let i=0; i<this.previousWorkout.exercises.length; i++) {
+                        for(let j=0; j<this.previousWorkout.exercises[i].sets.length; j++) {
+                            sum += this.previousWorkout.exercises[i].sets[j].weight*this.previousWorkout.exercises[i].sets[j].reps
+                        }
+                    }
+                    return sum; 
+                }
+            },
+
+            volumeDifference() {
+                let diff = this.workoutTotalVolume() - this.previousWorkoutTotalVolume()
+                if(isNaN(diff)) {
+                    return this.workoutTotalVolume()
+                }
+                if(diff > 0) {
+                    return "+" + diff
+                }
+                return diff
+            },
 
             workoutTotalVolume() {
                 let sum = 0; 
@@ -207,12 +252,14 @@
             getSimilarWorkouts() {
 
                 let filtered = []; 
-                filtered = this.state.workouts.filter(w => (w.template === this.workout.template || w.id === this.workout.template)); 
+                let key = this.workout.template || this.workout.id
+
+                filtered = this.state.workouts.filter(w => (w.template === key || w.id === key)); 
                 // sort from newest to oldest
                 filtered = filtered.sort((a,b) => (a.createdAt > b.createdAt) ? -1 : ((b.createdAt > a.createdAt) ? 1 : 0))
                 this.allWorkouts = filtered; 
                 // get previous workout, if there are any
-                if(filtered.length > 1) {
+                if(filtered.length > 1 && this.allWorkouts[1].createdAt < this.workout.createdAt) {
                     this.previousWorkout = this.allWorkouts[1]
                 }
 
@@ -308,7 +355,6 @@
 
             previousData(exerciseName, set) {
                 if(this.previousWorkout.exercises !== undefined)  {
-
                     const previous = this.previousWorkout.exercises.find(e => e.name === exerciseName)
                     if(previous && previous.sets && this.previousWorkout.createdAt < this.workout.createdAt) {
                         if(typeof previous.sets[set] !== 'undefined') {

@@ -90,7 +90,7 @@ html, body {
   margin-bottom: 60px; 
 }
 .navbar {
-  background: #000;
+  background:#121212 ;
   color: rgba(255,255,255,.87);
   padding: 0rem 1rem;
   height: 60px; 
