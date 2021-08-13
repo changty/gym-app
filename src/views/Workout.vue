@@ -38,10 +38,10 @@
                     <button @click="toggleEdit" class="btn btn-link">{{editButton}}</button>
                 </div>
             </div>
-            <button class="btn btn-primary text-center w-100">Volume: {{ volumeDifference() }}</button>
         </div>
     </div>
-
+            <button :class="'workout-total-volume btn btn-outline-primary text-center w-100 mb-3 ' + workout.status">Volume: {{ volumeDifference() }}</button>
+ 
 
       <div v-if="addExercise" class="card w-100 mb-3">
           <div class="card-body">
@@ -62,15 +62,16 @@
     <button @click="toggleAddExercise" class="btn-block btn btn-outline-primary mb-3" style="width:100%">{{addExerciseButtonText}}</button>
 
 
-        <div @click="toggleActive(item)" :class="'card mb-2 shadow-sm ' + item.active" v-for="(item, index) in workout.exercises" :key="item.name">
+        <div :class="'workout card mb-2 shadow ' + item.status" v-for="(item, index) in workout.exercises" :key="item.name">
             <div v-if="!item.edit" class="card-header d-flex w-100 justify-content-between">
                 <div>
                     <b>{{item.name}} ({{item.sets.length}} sets)</b>
                     <p class="card-text">{{item.notes}}</p>
                     <p @click="item.edit=!item.edit" class="text-muted link">Edit</p>
                 </div>
-                <div>
-                    <span>Volume: {{ totalExerciseVolume(index) }}/</span><span class="text-muted">{{previousExerciseVolume(index)}}</span><br/>
+                <div style="flex-shrink: 0;">
+                    <span class="text-muted">Volume</span><span><br/>{{ totalExerciseVolume(index) }}</span><span class="text-muted"> /{{previousExerciseVolume(index)}}</span><br/>
+                    <span>{{ exerciseDiff(index) }}</span>
                 </div>
             </div>
             <div v-if="item.edit" class="card-header d-flex w-100 justify-content-between">
@@ -171,14 +172,6 @@
         },
 
         methods: {
-            toggleActive(item) {
-                if(item.active && item.active.length > 0) {
-                    item.active = ''
-                }
-                else {
-                    item.active = 'lift'
-                }
-            },
             totalExerciseVolume(index) {
                 let sets =  this.workout.exercises[index].sets
                 let sum = 0; 
@@ -205,6 +198,35 @@
 
             },
 
+            exerciseDiff(index) {
+                let current = this.totalExerciseVolume(index); 
+                let previous = this.previousExerciseVolume(index); 
+
+                let diff = current-previous
+                
+                const item = this.workout.exercises[index]
+
+                if(diff === 0) {
+                    item.status = ''
+                }
+                else if(diff < 0) {
+                    item.status = 'red-txt lift'
+                }
+                else {
+                    item.status =  'green-txt'
+                }
+
+                if(isNaN(diff)) {
+                    return "-"
+                }
+                else if(diff > 0) {
+                    return '+' + diff
+                }
+                else {
+                    return diff
+                }
+            },
+
             previousWorkoutTotalVolume() {
                 let sum = 0; 
                 if(this.previousWorkout && this.previousWorkout.exercises) {
@@ -220,11 +242,14 @@
             volumeDifference() {
                 let diff = this.workoutTotalVolume() - this.previousWorkoutTotalVolume()
                 if(isNaN(diff)) {
+                    this.workout.status = 'white'
                     return this.workoutTotalVolume()
                 }
                 if(diff > 0) {
+                    this.workout.status = 'green'
                     return "+" + diff
                 }
+                this.workout.status = 'red'
                 return diff
             },
 
@@ -375,6 +400,10 @@
         background: rgb(122,222,196) !important; 
         color:#121212 !important;
     }
+
+    .workout.red-txt .badge.badge-primary {
+        background: #cd6a92 !important; 
+    }
     .badge {
         font-size: 16px; 
         padding: .5rem .75rem; 
@@ -396,6 +425,13 @@
         width: 70px;
     } */
 
+    .workout-total-volume {
+        position: -webkit-sticky !important;  
+        position: sticky !important; 
+        top: 10px !important; 
+        z-index: 9999999;
+        background: #121212;
+    }
 
 
 </style>

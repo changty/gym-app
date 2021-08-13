@@ -222,6 +222,10 @@ textarea.form-control {
   color: #121212 !important;
 }
 
+.btn.red {
+  border-color: #cd6a92 !important; 
+}
+
 .red {
   background: #cd6a92 !important;
   color: rgba(255,255,255,.87) !important;
@@ -232,6 +236,13 @@ textarea.form-control {
   color: rgba(255,255,255,.87) !important;
   color: #121212 !important;
 }
+
+.white {
+    color: #121212 !important; 
+    background: rgba(255,255,255,.87) !important;
+    border-color: rgba(255,255,255,.87) !important
+}
+
 
 .green-txt,
 .green-txt h1,
